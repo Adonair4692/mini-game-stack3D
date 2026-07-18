@@ -1,90 +1,104 @@
 # Height Stack
 
-Mini-game 3D mobile-first per browser. Il giocatore ferma blocchi in movimento,
-costruisce una torre e perde la parte non sovrapposta. Il punteggio non è
-astratto: **H** corrisponde alla somma delle altezze reali dei blocchi collocati,
-espressa in centimetri.
+A mobile-first 3D browser game in which players stop moving blocks to build an
+ever-growing tower. Any part of a block that does not overlap the previous layer
+is cut off and falls away.
 
-## Caratteristiche
+The score is not abstract: **H** represents the total real height of all
+successfully placed blocks, measured in centimetres.
 
-- rendering 3D con Three.js;
-- frammenti fisici con cannon-es;
-- input mouse, touch, penna, trackpad, barra spaziatrice e Invio;
-- taglio geometrico con collider aggiornati;
-- altezza progressiva: ogni blocco normale cresce di 1 cm;
-- blocco traguardo ogni 5 livelli, alto ×3 e più lento;
-- perfect placement e combo;
-- record locale, popup istruzioni, countdown e schermata finale;
-- soundtrack sostituibile ed effetti sonori sintetici;
-- interfaccia responsive portrait/landscape;
-- test Vitest e deploy automatico su GitHub Pages.
+## Features
 
-## Requisiti
+- 3D rendering with Three.js;
+- physics-based falling fragments with cannon-es;
+- mouse, touch, pen, trackpad, Space bar, and Enter input;
+- precise geometric cutting with updated physics colliders;
+- progressive height system: each regular block grows by 1 cm;
+- a milestone block every 5 levels, three times taller and slower;
+- perfect placement and combo system;
+- locally saved height record;
+- instructions dialog, countdown, and game-over screen;
+- replaceable soundtrack and synthesised sound effects;
+- responsive portrait and landscape interface;
+- Vitest test suite;
+- automatic deployment to GitHub Pages.
 
-- Node.js 20.19.x oppure 22.12 o successivo;
+## Requirements
+
+- Node.js 20.19.x, 22.12, or later;
 - npm;
-- un browser moderno con WebGL.
+- a modern browser with WebGL support.
 
-## Installazione e avvio
+## Installation and Local Development
 
 ```bash
 npm install
 npm run dev
 ```
 
-Vite mostrerà l’indirizzo locale da aprire nel browser.
+Vite will display the local address to open in your browser.
 
-## Test
+## Tests
 
 ```bash
 npm run test
 ```
 
-I test verificano sovrapposizioni, frammenti, perfect placement, conversione
-centimetri/unità 3D, progressione verticale e blocchi traguardo.
+The test suite covers:
 
-## Build e anteprima
+- full, partial, and missing overlaps;
+- retained and falling fragment geometry;
+- perfect-placement tolerance;
+- centimetre-to-world-unit conversion;
+- progressive block heights;
+- milestone block detection and dimensions;
+- total height calculation.
+
+## Build and Preview
 
 ```bash
 npm run build
 npm run preview
 ```
 
-La build viene generata in `dist/`.
+The production build is generated in the `dist/` directory.
 
-## Struttura
+## Project Structure
 
 ```text
-src/config.js                 configurazione centrale
-src/game/Game.js              stato e ciclo principale
-src/game/Block.js             mesh e dimensioni dei blocchi
-src/game/PhysicsManager.js    corpi cannon-es e pulizia frammenti
-src/game/CameraController.js  camera dinamica
-src/game/InputManager.js      input unificati
-src/audio/AudioManager.js     musica ed effetti sintetici
-src/ui/UIManager.js           HUD, dialoghi e animazioni HTML/CSS
-src/utils/overlap.js          calcoli geometrici puri
-src/utils/dimensions.js       altezze, traguardi e velocità
+src/config.js                 central configuration
+src/game/Game.js              main game state and loop
+src/game/Block.js             block meshes and dimensions
+src/game/PhysicsManager.js    cannon-es bodies and fragment cleanup
+src/game/CameraController.js  dynamic camera behaviour
+src/game/InputManager.js      unified input handling
+src/audio/AudioManager.js     music and synthesised sound effects
+src/ui/UIManager.js           HUD, dialogs, and HTML/CSS animations
+src/utils/overlap.js          pure geometric calculations
+src/utils/dimensions.js       heights, milestones, and speed calculations
 ```
 
-## Cambiare titolo e colore principale
+## Changing the Title and Main Colour
 
-Aprire `src/config.js`:
+Open `src/config.js`:
 
 ```js
 export const GAME_CONFIG = {
   gameTitle: 'HEIGHT STACK',
   gameSubtitle: 'Build higher. Place better.',
+
   colors: {
     primary: '#F2E600',
   },
 };
 ```
 
-`colors.primary` alimenta sia i materiali 3D sia la variabile CSS
-`--primary-color`.
+The `colors.primary` property controls both the 3D materials and the CSS
+variable `--primary-color`.
 
-## Regolare la crescita dei blocchi
+Changing this single value updates the main visual identity of the game.
+
+## Configuring Block Growth
 
 ```js
 block: {
@@ -95,14 +109,16 @@ block: {
 }
 ```
 
-- `initialHeightCm`: altezza del primo blocco;
-- `increasePerPlacedBlockCm`: crescita dopo ogni collocamento valido;
-- `maximumRegularHeightCm`: limite opzionale; `null` mantiene la crescita libera;
-- `worldUnitsPerCm`: conversione tra centimetri logici e mondo 3D.
+- `initialHeightCm`: height of the first playable block;
+- `increasePerPlacedBlockCm`: height added to each following regular block;
+- `maximumRegularHeightCm`: optional maximum regular height; use `null` for
+  unlimited growth;
+- `worldUnitsPerCm`: conversion between logical centimetres and 3D world units.
 
-H viene sempre accumulato come intero in centimetri.
+The value of **H** is always stored and calculated as a whole number of
+centimetres.
 
-## Configurare i blocchi traguardo
+## Configuring Milestone Blocks
 
 ```js
 milestone: {
@@ -112,10 +128,21 @@ milestone: {
 }
 ```
 
-Con questi valori i blocchi 5, 10, 15 e successivi sono alti tre volte la loro
-altezza normale e si muovono al 55% della velocità ordinaria corrente.
+With these settings, blocks 5, 10, 15, and every following multiple of five:
 
-## Regolare la difficoltà
+- are three times taller than their corresponding regular height;
+- move at 55% of the current regular speed;
+- use the same overlap and cutting rules as every other block.
+
+For example:
+
+```text
+Block 5 regular height: 14 cm
+Milestone multiplier: ×3
+Actual block height: 42 cm
+```
+
+## Adjusting Difficulty
 
 ```js
 movement: {
@@ -126,18 +153,43 @@ movement: {
 }
 ```
 
-La velocità è indipendente dal frame rate e viene limitata da `maximumSpeed`.
+The regular movement speed increases after every successfully placed block and
+is capped by `maximumSpeed`.
+
+Movement is calculated independently of the frame rate.
+
+## Height Score
+
+The primary score is the total constructed height:
+
+```text
+H 120 cm
+```
+
+It is calculated as the sum of the actual heights of all successfully placed
+blocks.
+
+Example:
+
+```text
+10 + 11 + 12 + 13 + 42 = 88 cm
+```
+
+The starting platform is not included.
+
+Perfect placements do not grant artificial bonus centimetres. They preserve
+the full block surface and increase the combo instead.
 
 ## Soundtrack
 
-La traccia di appoggio si trova in:
+The placeholder soundtrack is located at:
 
 ```text
 public/audio/soundtrack.mp3
 ```
 
-È una semplice composizione sintetica originale destinata ai test. Può essere
-sostituita mantenendo lo stesso nome oppure cambiando:
+It can be replaced while keeping the same filename, or by changing the path in
+`src/config.js`:
 
 ```js
 audio: {
@@ -146,77 +198,113 @@ audio: {
 }
 ```
 
-Il gioco continua a funzionare anche quando la soundtrack manca.
+The game continues to work when the soundtrack file is missing.
 
-## Effetti sonori
+Browser autoplay restrictions require the soundtrack to begin only after the
+player presses the Play button.
 
-Gli effetti provvisori vengono generati da `src/audio/AudioManager.js` con Web
-Audio API. Ogni evento usa un nome separato (`cut`, `perfect`, `milestoneIn`,
-`gameOver`, ecc.), quindi può essere sostituito in seguito con un file audio
-senza modificare la logica del gioco.
+## Sound Effects
 
-## GitHub Pages
+The temporary sound effects are generated in
+`src/audio/AudioManager.js` through the Web Audio API.
 
-1. creare un repository GitHub;
-2. caricare il progetto sul branch `main`;
-3. aprire **Settings → Pages**;
-4. scegliere **GitHub Actions** come sorgente;
-5. effettuare un push.
+Each game event has a separate sound identifier, including:
 
-Il workflow `.github/workflows/deploy.yml` esegue test, build e pubblicazione.
-La configurazione Vite usa percorsi relativi, quindi non è necessario inserire
-manualmente il nome del repository.
+```text
+place
+cut
+perfect
+combo
+milestoneIn
+milestonePlace
+newRecord
+miss
+gameOver
+button
+```
 
-Comandi Git essenziali:
+The synthesised effects can later be replaced with audio files without
+changing the main game logic.
+
+## GitHub Pages Deployment
+
+1. Create a GitHub repository.
+2. Upload or push the project to the `main` branch.
+3. Open **Settings → Pages**.
+4. Select **GitHub Actions** as the publishing source.
+5. Push a commit or manually run the deployment workflow.
+
+The workflow located at:
+
+```text
+.github/workflows/deploy.yml
+```
+
+automatically:
+
+- installs the dependencies;
+- runs the test suite;
+- creates the production build;
+- uploads the `dist/` directory;
+- deploys the game to GitHub Pages.
+
+The Vite configuration uses relative paths, so the repository name does not
+need to be entered manually.
+
+### Essential Git Commands
 
 ```bash
 git init
 git add .
 git commit -m "Initial Height Stack release"
 git branch -M main
-git remote add origin URL_DEL_REPOSITORY
+git remote add origin REPOSITORY_URL
 git push -u origin main
 ```
 
-## Pubblicazione su itch.io
+## Publishing on itch.io
 
-1. eseguire `npm run build`;
-2. comprimere **il contenuto** della cartella `dist/` in uno ZIP;
-3. creare un progetto itch.io di tipo HTML;
-4. caricare lo ZIP e selezionare l’esecuzione nel browser;
-5. scegliere una viewport responsiva o fullscreen.
+1. Run:
 
-`index.html` deve trovarsi alla radice dello ZIP.
+```bash
+npm run build
+```
 
-## Asset e licenze
+2. Compress the **contents** of the `dist/` directory into a ZIP file.
+3. Create a new HTML project on itch.io.
+4. Upload the ZIP file.
+5. Select the option to run the game in the browser.
+6. Use a responsive or fullscreen viewport.
 
-## Copyright e licenze
+The production `index.html` file must be located at the root of the uploaded
+ZIP archive.
 
-Copyright © 2026 Adriano Pantaleo. Tutti i diritti riservati.
+## Copyright and Licensing
 
-È consentito utilizzare la versione pubblicata del gioco esclusivamente per
-giocare a titolo personale e non commerciale.
+Copyright © 2026 Adriano Pantaleo. All rights reserved.
 
-Salvo preventiva autorizzazione scritta del titolare, non è consentito:
+The published version of the game may be used for personal, non-commercial
+play.
 
-- copiare o redistribuire il codice sorgente;
-- modificare o creare opere derivate dal progetto;
-- ripubblicare il gioco, integralmente o in parte;
-- utilizzare commercialmente il codice, il design, i testi, le animazioni,
-  gli effetti sonori, la soundtrack o gli altri asset originali;
-- rimuovere o alterare le indicazioni di copyright.
+Unless prior written permission is obtained from the copyright holder, users
+may not:
 
-La disponibilità pubblica del repository non costituisce concessione di una
-licenza open source e non attribuisce diritti ulteriori rispetto a quelli
-necessari per visualizzare il repository, utilizzare le funzionalità offerte
-da GitHub e giocare alla versione pubblicata.
+- copy or redistribute the source code;
+- modify the project or create derivative works;
+- republish the game, in whole or in substantial part;
+- commercially exploit the code, visual design, texts, animations, soundtrack,
+  sound effects, or other original assets;
+- remove or alter copyright notices.
 
-Le librerie e le dipendenze di terze parti, tra cui Three.js, cannon-es, Vite
-e Vitest, restano soggette alle rispettive licenze.
+The public availability of this repository does not constitute the grant of an
+open-source licence.
 
-La traccia sintetica inclusa è un asset provvisorio realizzato per questo
-progetto. Per eventuali asset aggiunti successivamente dovrà essere conservata
-la documentazione relativa alla provenienza, alla licenza e ai diritti di
-utilizzo.
+Third-party libraries and development dependencies, including Three.js,
+cannon-es, Vite, and Vitest, remain subject to their respective licences and
+copyright notices.
 
-Per richieste di autorizzazione o licenza contattare il titolare del copyright.
+The included synthetic soundtrack is a temporary asset created for this
+project. For any assets added in the future, documentation concerning origin,
+licensing, and distribution rights should be retained.
+
+For permission or licensing enquiries, contact the copyright holder.
