@@ -4,7 +4,10 @@ import { PhysicsManager } from './PhysicsManager.js';
 import { StackManager } from './StackManager.js';
 import { CameraController } from './CameraController.js';
 import { InputManager } from './InputManager.js';
-import { calculatePlacement } from '../utils/overlap.js';
+import {
+  calculatePlacement,
+  calculatePlacement2D,
+} from '../utils/overlap.js';
 import {
   addHeightCm,
   cmToWorld,
