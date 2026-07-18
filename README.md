@@ -190,7 +190,33 @@ git push -u origin main
 
 ## Asset e licenze
 
-Il codice è distribuito con licenza MIT. La traccia sintetica inclusa è stata
-creata appositamente come placeholder per questo progetto. Per musica, font,
-icone o asset futuri, conservare sempre prova della licenza e dell’autorizzazione
-alla distribuzione su GitHub Pages e itch.io.
+## Copyright e licenze
+
+Copyright © 2026 Adriano Pantaleo. Tutti i diritti riservati.
+
+È consentito utilizzare la versione pubblicata del gioco esclusivamente per
+giocare a titolo personale e non commerciale.
+
+Salvo preventiva autorizzazione scritta del titolare, non è consentito:
+
+- copiare o redistribuire il codice sorgente;
+- modificare o creare opere derivate dal progetto;
+- ripubblicare il gioco, integralmente o in parte;
+- utilizzare commercialmente il codice, il design, i testi, le animazioni,
+  gli effetti sonori, la soundtrack o gli altri asset originali;
+- rimuovere o alterare le indicazioni di copyright.
+
+La disponibilità pubblica del repository non costituisce concessione di una
+licenza open source e non attribuisce diritti ulteriori rispetto a quelli
+necessari per visualizzare il repository, utilizzare le funzionalità offerte
+da GitHub e giocare alla versione pubblicata.
+
+Le librerie e le dipendenze di terze parti, tra cui Three.js, cannon-es, Vite
+e Vitest, restano soggette alle rispettive licenze.
+
+La traccia sintetica inclusa è un asset provvisorio realizzato per questo
+progetto. Per eventuali asset aggiunti successivamente dovrà essere conservata
+la documentazione relativa alla provenienza, alla licenza e ai diritti di
+utilizzo.
+
+Per richieste di autorizzazione o licenza contattare il titolare del copyright.
