@@ -280,23 +280,16 @@ export class Game {
     const axis = blockNumber % 2 === 1 ? 'x' : 'z';
     const side = Math.floor((blockNumber - 1) / 2) % 2 === 0 ? -1 : 1;
     const perpendicularAxis = axis === 'x' ? 'z' : 'x';
-
-const perpendicularSize =
-  perpendicularAxis === 'x'
-    ? lower.width
-    : lower.depth;
-
-const zigzagEnabled =
-  milestone &&
-  this.config.milestone.zigzag?.enabled;
-
-const zigzagAmplitude = zigzagEnabled
-  ? Math.min(
-      perpendicularSize *
-        this.config.milestone.zigzag.amplitudeRatio,
-      this.config.milestone.zigzag.maximumAmplitude,
-    )
-  : 0;
+    const perpendicularSize =
+      perpendicularAxis === 'x' ? lower.width : lower.depth;
+    const zigzagEnabled =
+      milestone && this.config.milestone.zigzag?.enabled;
+    const zigzagAmplitude = zigzagEnabled
+      ? Math.min(
+          perpendicularSize * this.config.milestone.zigzag.amplitudeRatio,
+          this.config.milestone.zigzag.maximumAmplitude,
+        )
+      : 0;
     const position = {
       x: lower.x,
       z: lower.z,
@@ -321,10 +314,10 @@ const zigzagAmplitude = zigzagEnabled
     this.currentMotion = {
       axis,
       perpendicularAxis,
-perpendicularCenter: lower[perpendicularAxis],
-zigzagAmplitude,
-zigzagCyclesPerPass:
-  this.config.milestone.zigzag?.cyclesPerPass ?? 0,
+      perpendicularCenter: lower[perpendicularAxis],
+      zigzagAmplitude,
+      zigzagCyclesPerPass:
+        this.config.milestone.zigzag?.cyclesPerPass ?? 0,
       direction: -side,
       speed: getBlockSpeed(
         blockNumber,
@@ -374,18 +367,36 @@ zigzagCyclesPerPass:
     const moving = this.currentBlock;
     const axis = this.currentMotion.axis;
     const original = moving.getData();
-    const placement = calculatePlacement(
-      lower.getData(),
-      original,
-      axis,
-      this.config.perfectPlacement.tolerance,
-    );
+    const useTwoAxisPlacement =
+      moving.milestone && this.config.milestone.zigzag?.enabled;
+
+    const placement = useTwoAxisPlacement
+      ? calculatePlacement2D(
+          lower.getData(),
+          original,
+          this.config.perfectPlacement.tolerance,
+        )
+      : calculatePlacement(
+          lower.getData(),
+          original,
+          axis,
+          this.config.perfectPlacement.tolerance,
+        );
 
     if (!placement.hit) {
       const missed = moving;
-      const impulseSide = Math.sign(missed[axis] - lower[axis]) || this.currentMotion.direction;
+      let impulseAxis = axis;
+      let impulseSide = Math.sign(missed[axis] - lower[axis]) || this.currentMotion.direction;
+
+      if (useTwoAxisPlacement) {
+        const deltaX = placement.deltaX ?? missed.x - lower.x;
+        const deltaZ = placement.deltaZ ?? missed.z - lower.z;
+        impulseAxis = Math.abs(deltaX) >= Math.abs(deltaZ) ? 'x' : 'z';
+        impulseSide = Math.sign(impulseAxis === 'x' ? deltaX : deltaZ) || 1;
+      }
+
       this.physics.addDynamicBlock(missed, {
-        impulseAxis: axis,
+        impulseAxis,
         impulseSide,
         impulseScale: 1.2,
       });
@@ -402,7 +413,12 @@ zigzagCyclesPerPass:
     let newX = original.x;
     let newZ = original.z;
 
-    if (axis === 'x') {
+    if (useTwoAxisPlacement) {
+      newWidth = placement.retained.width;
+      newDepth = placement.retained.depth;
+      newX = placement.retained.x;
+      newZ = placement.retained.z;
+    } else if (axis === 'x') {
       newWidth = placement.retained.size;
       newX = placement.retained.center;
       if (placement.perfect) newZ = lower.z;
@@ -417,34 +433,62 @@ zigzagCyclesPerPass:
     this.physics.addStaticBlock(moving);
     this.stack.add(moving);
 
-    if (placement.fragment) {
-      const fragmentWidth = axis === 'x' ? placement.fragment.size : original.width;
-      const fragmentDepth = axis === 'z' ? placement.fragment.size : original.depth;
-      const fragmentX = axis === 'x' ? placement.fragment.center : original.x;
-      const fragmentZ = axis === 'z' ? placement.fragment.center : original.z;
+    const fragments = useTwoAxisPlacement
+      ? placement.fragments
+      : placement.fragment
+        ? [
+            {
+              x: axis === 'x' ? placement.fragment.center : original.x,
+              z: axis === 'z' ? placement.fragment.center : original.z,
+              width: axis === 'x' ? placement.fragment.size : original.width,
+              depth: axis === 'z' ? placement.fragment.size : original.depth,
+              axis,
+              side: placement.fragment.side,
+            },
+          ]
+        : [];
+
+    let totalCutRatio = 0;
+
+    for (const fragmentData of fragments) {
+      const fragmentArea = fragmentData.width * fragmentData.depth;
+      const originalArea = Math.max(original.width * original.depth, Number.EPSILON);
+      const cutRatio = fragmentArea / originalArea;
+      totalCutRatio += cutRatio;
+
       const fragment = new Block({
         scene: this.scene,
-        x: fragmentX,
+        x: fragmentData.x,
         y: original.y,
-        z: fragmentZ,
-        width: fragmentWidth,
-        depth: fragmentDepth,
+        z: fragmentData.z,
+        width: fragmentData.width,
+        depth: fragmentData.depth,
         heightWorld: original.heightWorld,
         heightCm: original.heightCm,
         color: moving.milestone ? this.config.colors.milestone : this.config.colors.primary,
         milestone: moving.milestone,
         blockNumber: moving.blockNumber,
-        name: `fragment-${moving.blockNumber}`,
+        name: `fragment-${moving.blockNumber}-${fragmentData.axis}`,
       });
-      const cutRatio = placement.fragment.size / (axis === 'x' ? original.width : original.depth);
+
       this.physics.addDynamicBlock(fragment, {
-        impulseAxis: axis,
-        impulseSide: placement.fragment.side,
+        impulseAxis: fragmentData.axis,
+        impulseSide: fragmentData.side,
         impulseScale: 0.8 + cutRatio * 0.8,
       });
-      this.audio.play('cut', { intensity: 0.65 + cutRatio });
-      if (cutRatio > 0.38) this.cameraController.shake(0.07 + cutRatio * 0.08);
-      this.createBurst(fragment.mesh.position, moving.milestone ? this.config.colors.milestone : this.config.colors.primary, 7);
+
+      this.createBurst(
+        fragment.mesh.position,
+        moving.milestone ? this.config.colors.milestone : this.config.colors.primary,
+        7,
+      );
+    }
+
+    if (fragments.length > 0) {
+      this.audio.play('cut', { intensity: 0.65 + totalCutRatio });
+      if (totalCutRatio > 0.38) {
+        this.cameraController.shake(0.07 + Math.min(totalCutRatio, 1) * 0.08);
+      }
     }
 
     const oldHeight = this.stats.heightCm;
@@ -520,7 +564,6 @@ zigzagCyclesPerPass:
       if (this.state !== 'transition') return;
       this.spawnNextBlock({ activate: true, announce: true });
     }, moving.milestone ? 260 : 150);
-
   }
 
   finishGame() {
@@ -658,36 +701,27 @@ zigzagCyclesPerPass:
         this.currentMotion.direction = 1;
       }
       this.currentBlock.setAxisPosition(axis, next);
+
       const {
-  perpendicularAxis,
-  perpendicularCenter,
-  zigzagAmplitude,
-  zigzagCyclesPerPass,
-  min,
-  max,
-} = this.currentMotion;
-
-if (zigzagAmplitude > 0 && perpendicularAxis) {
-  const travelRange = Math.max(max - min, Number.EPSILON);
-
-  const progress = Math.min(
-    1,
-    Math.max(0, (next - min) / travelRange),
-  );
-
-  const zigzagOffset =
-    Math.sin(
-      progress *
-        Math.PI *
-        2 *
+        perpendicularAxis,
+        perpendicularCenter,
+        zigzagAmplitude,
         zigzagCyclesPerPass,
-    ) * zigzagAmplitude;
+        min,
+        max,
+      } = this.currentMotion;
 
-  this.currentBlock.setAxisPosition(
-    perpendicularAxis,
-    perpendicularCenter + zigzagOffset,
-  );
-}
+      if (zigzagAmplitude > 0 && perpendicularAxis) {
+        const travelRange = Math.max(max - min, Number.EPSILON);
+        const progress = Math.min(1, Math.max(0, (next - min) / travelRange));
+        const zigzagOffset =
+          Math.sin(progress * Math.PI * 2 * zigzagCyclesPerPass) * zigzagAmplitude;
+
+        this.currentBlock.setAxisPosition(
+          perpendicularAxis,
+          perpendicularCenter + zigzagOffset,
+        );
+      }
     }
 
     if (!['paused', 'intro', 'countdown'].includes(this.state)) {
