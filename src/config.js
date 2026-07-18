@@ -30,7 +30,7 @@ export const GAME_CONFIG = {
   },
 
   milestone: {
-    everyBlocks: 5,
+    everyBlocks: 10,
     heightMultiplier: 3,
     speedMultiplier: 0.55,
     announce: true,
