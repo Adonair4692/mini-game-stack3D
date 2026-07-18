@@ -1,24 +1,47 @@
 Copyright © 2026 Adriano Pantaleo. All rights reserved.
 
-This software, including its source code, game mechanics implementation,
-visual design, user interface, texts, sounds, animations, documentation,
-and associated original assets, is proprietary.
+PROPRIETARY SOFTWARE NOTICE
 
-No permission is granted to copy, modify, merge, publish, distribute,
-sublicense, sell, commercially exploit, or create derivative works from
-this software, in whole or in substantial part, without the prior written
-permission of the copyright holder.
+This project, including its original source code, software architecture,
+gameplay implementation, visual design, user interface, texts, animations,
+sound effects, soundtrack, documentation, and associated original assets,
+is proprietary.
 
-The public availability of this repository and access to the playable game
-do not constitute a grant of an open-source license.
+A limited, non-exclusive, non-transferable right is granted to access and
+play the publicly deployed version of the game for personal, non-commercial
+purposes only.
 
-Third-party libraries, dependencies, and components used by this project
-remain subject to their respective licenses and copyright notices.
+Except with the prior written permission of the copyright holder, no person
+or organisation may:
 
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. IN NO EVENT SHALL
-THE COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY
-ARISING FROM THE USE OF THE SOFTWARE.
+- copy, reproduce, or redistribute the source code or original assets;
+- modify, adapt, translate, merge, or create derivative works from the project;
+- republish, host, mirror, sublicense, sell, rent, or commercially exploit the
+  game or any substantial part of it;
+- use the source code or original assets in another product, service, game,
+  website, application, or commercial activity;
+- remove, obscure, or alter any copyright, authorship, or proprietary notice.
 
-For permissions and licensing enquiries, contact the copyright holder.
+The public availability of the repository and the playable version of the
+game does not constitute the grant of an open-source licence.
+
+No rights are granted by implication, estoppel, or otherwise, except for the
+limited permission to access and play the publicly deployed version described
+above.
+
+Third-party libraries, dependencies, tools, fonts, and other external
+components remain the property of their respective copyright holders and are
+subject to their own licence terms. This notice does not restrict any rights
+granted directly by those third-party licences.
+
+THE SOFTWARE AND ALL ORIGINAL PROJECT MATERIALS ARE PROVIDED “AS IS”, WITHOUT
+WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+NON-INFRINGEMENT.
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE COPYRIGHT HOLDER SHALL
+NOT BE LIABLE FOR ANY CLAIM, LOSS, DAMAGE, OR OTHER LIABILITY ARISING FROM OR
+IN CONNECTION WITH THE SOFTWARE OR ITS USE.
+
+For permissions, commercial licensing, or other enquiries, contact the
+copyright holder.
