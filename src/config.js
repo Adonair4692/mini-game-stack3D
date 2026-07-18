@@ -35,6 +35,12 @@ export const GAME_CONFIG = {
     speedMultiplier: 0.55,
     announce: true,
     announcementDuration: 850,
+    zigzag: {
+  enabled: true,
+  amplitudeRatio: 0.18,
+  maximumAmplitude: 0.4,
+  cyclesPerPass: 2,
+},
   },
 
   movement: {
