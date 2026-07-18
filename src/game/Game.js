@@ -276,6 +276,24 @@ export class Game {
     const heightWorld = cmToWorld(heightCm, this.config.block.worldUnitsPerCm);
     const axis = blockNumber % 2 === 1 ? 'x' : 'z';
     const side = Math.floor((blockNumber - 1) / 2) % 2 === 0 ? -1 : 1;
+    const perpendicularAxis = axis === 'x' ? 'z' : 'x';
+
+const perpendicularSize =
+  perpendicularAxis === 'x'
+    ? lower.width
+    : lower.depth;
+
+const zigzagEnabled =
+  milestone &&
+  this.config.milestone.zigzag?.enabled;
+
+const zigzagAmplitude = zigzagEnabled
+  ? Math.min(
+      perpendicularSize *
+        this.config.milestone.zigzag.amplitudeRatio,
+      this.config.milestone.zigzag.maximumAmplitude,
+    )
+  : 0;
     const position = {
       x: lower.x,
       z: lower.z,
@@ -299,6 +317,11 @@ export class Game {
 
     this.currentMotion = {
       axis,
+      perpendicularAxis,
+perpendicularCenter: lower[perpendicularAxis],
+zigzagAmplitude,
+zigzagCyclesPerPass:
+  this.config.milestone.zigzag?.cyclesPerPass ?? 0,
       direction: -side,
       speed: getBlockSpeed(
         blockNumber,
@@ -632,6 +655,36 @@ export class Game {
         this.currentMotion.direction = 1;
       }
       this.currentBlock.setAxisPosition(axis, next);
+      const {
+  perpendicularAxis,
+  perpendicularCenter,
+  zigzagAmplitude,
+  zigzagCyclesPerPass,
+  min,
+  max,
+} = this.currentMotion;
+
+if (zigzagAmplitude > 0 && perpendicularAxis) {
+  const travelRange = Math.max(max - min, Number.EPSILON);
+
+  const progress = Math.min(
+    1,
+    Math.max(0, (next - min) / travelRange),
+  );
+
+  const zigzagOffset =
+    Math.sin(
+      progress *
+        Math.PI *
+        2 *
+        zigzagCyclesPerPass,
+    ) * zigzagAmplitude;
+
+  this.currentBlock.setAxisPosition(
+    perpendicularAxis,
+    perpendicularCenter + zigzagOffset,
+  );
+}
     }
 
     if (!['paused', 'intro', 'countdown'].includes(this.state)) {
