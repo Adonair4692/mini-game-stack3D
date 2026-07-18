@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#08090C" />
+    <meta name="description" content="Costruisci una torre sempre più alta e supera il tuo record." />
+    <link rel="icon" href="./icons/app-icon.svg" type="image/svg+xml" />
+    <title>Height Stack</title>
+  </head>
+  <body>
+    <main id="app" class="app-shell">
+      <div id="game-stage" class="game-stage" aria-label="Area di gioco 3D"></div>
+
+      <section id="hud" class="hud is-hidden" aria-label="Punteggio e stato della partita">
+        <div class="hud-top">
+          <button id="info-button" class="icon-button" type="button" aria-label="Apri le istruzioni">i</button>
+          <div class="height-display" aria-live="polite" aria-atomic="true">
+            <span class="height-label">H</span>
+            <span id="height-value" class="height-value">0</span>
+            <span class="height-unit">cm</span>
+            <span id="record-value" class="record-value">RECORD 0 cm</span>
+          </div>
+          <button id="audio-button" class="icon-button" type="button" aria-label="Disattiva audio">♪</button>
+        </div>
+
+        <div id="combo-display" class="combo-display is-hidden" aria-live="polite"></div>
+        <div id="next-block" class="next-block" aria-live="polite"></div>
+        <div id="floating-layer" class="floating-layer" aria-hidden="true"></div>
+
+        <aside id="height-ruler" class="height-ruler" aria-label="Traguardi di altezza">
+          <div id="ruler-progress" class="ruler-progress"></div>
+          <div id="ruler-marks" class="ruler-marks"></div>
+        </aside>
+      </section>
+
+      <div id="countdown" class="countdown is-hidden" aria-live="assertive"></div>
+      <div id="announcement" class="announcement is-hidden" aria-live="assertive"></div>
+      <div id="status-live" class="sr-only" aria-live="assertive"></div>
+
+      <div id="dialog-backdrop" class="dialog-backdrop">
+        <section id="intro-dialog" class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+          <p id="dialog-kicker" class="dialog-kicker">3D TOWER GAME</p>
+          <h1 id="dialog-title">HEIGHT STACK</h1>
+          <p id="dialog-subtitle" class="dialog-subtitle">Build higher. Place better.</p>
+
+          <div class="rules-grid">
+            <div class="rule-block">
+              <h2>Obiettivo</h2>
+              <p>Costruisci la torre più alta possibile. L’altezza totale è il tuo punteggio.</p>
+            </div>
+            <div class="rule-block">
+              <h2>Come si gioca</h2>
+              <p>Ferma il blocco sopra quello precedente. La parte sporgente viene tagliata e cade.</p>
+            </div>
+            <div class="rule-block">
+              <h2>Altezza</h2>
+              <p>Ogni blocco cresce di 1 cm. Ogni quinto blocco è alto tre volte tanto e si muove più lentamente.</p>
+            </div>
+            <div class="rule-block">
+              <h2>Perfect</h2>
+              <p>Allinea perfettamente il blocco per conservare tutta la superficie e aumentare la combo.</p>
+            </div>
+          </div>
+
+          <p id="input-hint" class="input-hint">CLICCA, TOCCA O PREMI SPAZIO</p>
+
+          <div class="dialog-controls">
+            <label class="audio-toggle">
+              <input id="music-toggle" type="checkbox" checked />
+              <span>Musica</span>
+            </label>
+            <label class="audio-toggle">
+              <input id="sfx-toggle" type="checkbox" checked />
+              <span>Effetti</span>
+            </label>
+          </div>
+
+          <button id="primary-dialog-button" class="primary-button" type="button">GIOCA</button>
+        </section>
+
+        <section id="gameover-dialog" class="dialog is-hidden" role="dialog" aria-modal="true" aria-labelledby="gameover-title">
+          <p class="dialog-kicker">PARTITA TERMINATA</p>
+          <h1 id="gameover-title">ALTEZZA RAGGIUNTA</h1>
+          <div class="final-height"><span>H</span> <strong id="final-height-value">0</strong> <span>cm</span></div>
+          <p id="new-record-label" class="new-record-label is-hidden">NUOVO RECORD</p>
+
+          <dl class="stats-grid">
+            <div><dt>Record</dt><dd id="final-record">0 cm</dd></div>
+            <div><dt>Blocchi</dt><dd id="final-blocks">0</dd></div>
+            <div><dt>Perfect</dt><dd id="final-perfects">0</dd></div>
+            <div><dt>Migliore combo</dt><dd id="final-combo">×0</dd></div>
+            <div><dt>Traguardi</dt><dd id="final-milestones">0</dd></div>
+          </dl>
+
+          <div class="gameover-actions">
+            <button id="retry-button" class="primary-button" type="button">RIPROVA</button>
+            <button id="gameover-info-button" class="secondary-button" type="button">ISTRUZIONI</button>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

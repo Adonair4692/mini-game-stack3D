@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">Height Stack</title>
+  <rect width="128" height="128" rx="24" fill="#08090c"/>
+  <path fill="#f2e600" d="M24 82h80v18H24zm10-25h60v18H34zm11-23h38v16H45z"/>
+</svg>
